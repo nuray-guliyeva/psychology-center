@@ -1,14 +1,15 @@
 package com.psychcenter.backend.psychologist.service;
 
-import com.psychcenter.backend.psychologist.entity.Psychologist;
+import com.psychcenter.backend.psychologist.dto.PsychologistRequestDto;
+import com.psychcenter.backend.psychologist.dto.PsychologistResponseDto;
 
 import java.util.List;
 
 public interface PsychologistService {
 
-    List<Psychologist> getAll();
+    List<PsychologistResponseDto> getAll();
 
-    Psychologist getById(Long id);
+    PsychologistResponseDto getById(Long id);
 
-    Psychologist create(Psychologist psychologist);
+    PsychologistResponseDto create(PsychologistRequestDto dto);
 }
