@@ -38,4 +38,28 @@ public class PsychologistServiceImpl implements PsychologistService {
         Psychologist saved = repository.save(entity);
         return PsychologistMapper.toDto(saved);
     }
+
+    @Override
+    public PsychologistResponseDto update(Long id, PsychologistRequestDto dto) {
+        Psychologist existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Psychologist not found with id: " + id));
+
+        existing.setFirstName(dto.getFirstName());
+        existing.setLastName(dto.getLastName());
+        existing.setSpecialization(dto.getSpecialization());
+        existing.setExperienceYears(dto.getExperienceYears());
+        existing.setEmail(dto.getEmail());
+        existing.setPhone(dto.getPhone());
+
+        Psychologist updated = repository.save(existing);
+        return PsychologistMapper.toDto(updated);
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Psychologist not found with id: " + id);
+        }
+        repository.deleteById(id);
+    }
 }

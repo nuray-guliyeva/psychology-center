@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/psychologists")
+@RequestMapping("/api/psychologists")
 @RequiredArgsConstructor
 public class PsychologistController {
 
@@ -28,5 +28,18 @@ public class PsychologistController {
     @PostMapping
     public PsychologistResponseDto create(@RequestBody PsychologistRequestDto dto) {
         return service.create(dto);
+    }
+
+    @PutMapping("/{id}")
+    public PsychologistResponseDto update(
+            @PathVariable Long id,
+            @RequestBody PsychologistRequestDto dto
+    ) {
+        return service.update(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 }

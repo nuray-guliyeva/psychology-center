@@ -12,4 +12,8 @@ public interface PsychologistService {
     PsychologistResponseDto getById(Long id);
 
     PsychologistResponseDto create(PsychologistRequestDto dto);
+
+    PsychologistResponseDto update(Long id, PsychologistRequestDto dto);
+
+    void delete(Long id);
 }
