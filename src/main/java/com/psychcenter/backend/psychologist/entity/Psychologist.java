@@ -27,4 +27,6 @@ public class Psychologist {
     private String email;
 
     private String phone;
+
+
 }

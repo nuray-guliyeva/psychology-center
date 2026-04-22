@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/psychologists")
+@RequestMapping("/api/v1/psychologists")
 @RequiredArgsConstructor
 public class PsychologistController {
 
