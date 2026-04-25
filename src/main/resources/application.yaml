@@ -12,3 +12,5 @@ spring:
       ddl-auto: update
     show-sql: true
 
+jwt:
+  secret: my-super-secret-key-12345678901234567890802504735849759832478585858585
