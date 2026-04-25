@@ -4,9 +4,9 @@ import com.psychcenter.backend.common.exception.base.BaseException;
 import com.psychcenter.backend.common.exception.base.ErrorCode;
 import org.springframework.http.HttpStatus;
 
-public class InvalidCredentialsException extends BaseException {
+public class UserAlreadyExistsException extends BaseException {
 
-    public InvalidCredentialsException(String message) {
-        super(ErrorCode.INVALID_CREDENTIALS, message, HttpStatus.UNAUTHORIZED);
+    public UserAlreadyExistsException(String message) {
+        super(ErrorCode.USER_ALREADY_EXISTS, message, HttpStatus.CONFLICT);
     }
 }

@@ -5,7 +5,6 @@ import com.psychcenter.backend.config.JwtService;
 import com.psychcenter.backend.user.entity.Role;
 import com.psychcenter.backend.user.entity.User;
 import com.psychcenter.backend.user.repository.UserRepository;
-import com.psychcenter.backend.common.exception.user.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException(request.getEmail());
+            throw new RuntimeException("User already exists");
         }
 
         User user = User.builder()
@@ -33,7 +32,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String token = jwtService.generateToken(user.getEmail());
+        String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
 
         return AuthResponse.builder()
                 .token(token)
@@ -49,7 +48,7 @@ public class AuthService {
             throw new RuntimeException("Wrong password");
         }
 
-        String token = jwtService.generateToken(user.getEmail());
+        String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
 
         return AuthResponse.builder()
                 .token(token)

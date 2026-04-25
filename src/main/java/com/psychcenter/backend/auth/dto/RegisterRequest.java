@@ -1,5 +1,6 @@
 package com.psychcenter.backend.auth.dto;
 
+import com.psychcenter.backend.user.entity.Role;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -15,4 +16,6 @@ public class RegisterRequest {
 
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+
+    private Role role;
 }
