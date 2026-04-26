@@ -1,6 +1,8 @@
 package com.psychcenter.backend.auth.service;
 
 import com.psychcenter.backend.auth.dto.*;
+import com.psychcenter.backend.common.exception.auth.InvalidCredentialsException;
+import com.psychcenter.backend.common.exception.auth.UserAlreadyExistsException;
 import com.psychcenter.backend.config.JwtService;
 import com.psychcenter.backend.user.entity.Role;
 import com.psychcenter.backend.user.entity.User;
@@ -20,7 +22,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new UserAlreadyExistsException("User already exists with email: " + request.getEmail());
         }
 
         User user = User.builder()
@@ -42,10 +44,12 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new InvalidCredentialsException("Invalid email or password")
+                );
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Wrong password");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
