@@ -2,12 +2,17 @@ package com.psychcenter.backend.psychologist.service;
 
 import com.psychcenter.backend.psychologist.dto.PsychologistRequestDto;
 import com.psychcenter.backend.psychologist.dto.PsychologistResponseDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PsychologistService {
 
-    List<PsychologistResponseDto> getAll();
+    Page<PsychologistResponseDto> getAll(
+            String specialization,
+            String language,
+            Integer minExperience,
+            Pageable pageable
+    );
 
     PsychologistResponseDto getById(Long id);
 
