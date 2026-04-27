@@ -1,5 +1,7 @@
 package com.psychcenter.backend.psychologist.service;
 
+import com.psychcenter.backend.common.exception.base.ErrorCode;
+import com.psychcenter.backend.common.exception.base.BaseException;
 import com.psychcenter.backend.psychologist.dto.PsychologistRequestDto;
 import com.psychcenter.backend.psychologist.dto.PsychologistResponseDto;
 import com.psychcenter.backend.psychologist.entity.Psychologist;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class PsychologistServiceImpl implements PsychologistService {
 
     private final PsychologistRepository repository;
+    private final PsychologistMapper mapper;
 
     @Override
     public Page<PsychologistResponseDto> getAll(
@@ -32,51 +36,57 @@ public class PsychologistServiceImpl implements PsychologistService {
                 .and(PsychologistSpecification.hasMinExperience(minExperience));
 
         return repository.findAll(spec, pageable)
-                .map(PsychologistMapper::toDto);
+                .map(mapper::toDto);
     }
 
     @Override
     public PsychologistResponseDto getById(Long id) {
         Psychologist psychologist = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Psychologist not found with id: " + id));
+                .orElseThrow(() ->
+                        new BaseException(
+                                ErrorCode.RESOURCE_NOT_FOUND,
+                                "Psychologist not found with id: " + id,
+                                HttpStatus.NOT_FOUND
+                        )
+                );
 
-        return PsychologistMapper.toDto(psychologist);
+        return mapper.toDto(psychologist);
     }
 
     @Override
     public PsychologistResponseDto create(PsychologistRequestDto dto) {
-        Psychologist entity = PsychologistMapper.toEntity(dto);
+        Psychologist entity = mapper.toEntity(dto);
         Psychologist saved = repository.save(entity);
-        return PsychologistMapper.toDto(saved);
+        return mapper.toDto(saved);
     }
 
     @Override
     public PsychologistResponseDto update(Long id, PsychologistRequestDto dto) {
 
         Psychologist existing = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Psychologist not found with id: " + id));
+                .orElseThrow(() ->
+                        new BaseException(
+                                ErrorCode.RESOURCE_NOT_FOUND,
+                                "Psychologist not found with id: " + id,
+                                HttpStatus.NOT_FOUND
+                        )
+                );
 
-        existing.setFirstName(dto.getFirstName());
-        existing.setLastName(dto.getLastName());
-        existing.setSpecialization(dto.getSpecialization());
-        existing.setExperienceYears(dto.getExperienceYears());
-        existing.setEmail(dto.getEmail());
-        existing.setPhone(dto.getPhone());
-        existing.setBio(dto.getBio());
-        existing.setEducation(dto.getEducation());
-        existing.setCertificates(dto.getCertificates());
-        existing.setLanguages(dto.getLanguages());
-        existing.setApproach(dto.getApproach());
+        mapper.updateEntity(existing, dto);
 
         Psychologist updated = repository.save(existing);
 
-        return PsychologistMapper.toDto(updated);
+        return mapper.toDto(updated);
     }
 
     @Override
     public void delete(Long id) {
         if (!repository.existsById(id)) {
-            throw new RuntimeException("Psychologist not found with id: " + id);
+            throw new BaseException(
+                    ErrorCode.RESOURCE_NOT_FOUND,
+                    "Psychologist not found with id: " + id,
+                    HttpStatus.NOT_FOUND
+            );
         }
         repository.deleteById(id);
     }
