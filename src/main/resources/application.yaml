@@ -13,4 +13,3 @@ spring:
     show-sql: true
 
 jwt:
-  secret: mysupersecretkey2345678901234567890802504735849759832478585858585
