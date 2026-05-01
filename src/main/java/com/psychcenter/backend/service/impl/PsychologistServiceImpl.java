@@ -7,9 +7,13 @@ import com.psychcenter.backend.model.entity.Psychologist;
 import com.psychcenter.backend.repository.PsychologistRepository;
 import com.psychcenter.backend.service.PsychologistService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.psychcenter.backend.specification.PsychologistSpecification.hasLanguage;
+import static com.psychcenter.backend.specification.PsychologistSpecification.hasSpecialization;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +65,18 @@ public class PsychologistServiceImpl implements PsychologistService {
         return mapper.toDto(
                 repository.findById(id).orElseThrow()
         );
+    }
+
+    @Override
+    public List<PsychologistResponseDto> filter(String specialization, String language) {
+
+        var spec = Specification
+                .where(hasSpecialization(specialization))
+                .and(hasLanguage(language));
+
+        return repository.findAll(spec)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
     }
 }

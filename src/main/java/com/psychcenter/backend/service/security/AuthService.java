@@ -17,6 +17,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthResponse register(RegisterRequest request) {
 
@@ -35,8 +36,11 @@ public class AuthService {
 
         userRepository.save(user);
 
+        var refresh = refreshTokenService.create(user);
+
         return AuthResponse.builder()
-                .token(jwtService.generateToken(user.getEmail(), user.getRole().name()))
+                .accessToken(jwtService.generateToken(user.getEmail(), user.getRole().name()))
+                .refreshToken(refresh.getToken())
                 .build();
     }
 
@@ -55,8 +59,11 @@ public class AuthService {
             );
         }
 
+        var refresh = refreshTokenService.create(user);
+
         return AuthResponse.builder()
-                .token(jwtService.generateToken(user.getEmail(), user.getRole().name()))
+                .accessToken(jwtService.generateToken(user.getEmail(), user.getRole().name()))
+                .refreshToken(refresh.getToken())
                 .build();
     }
 }

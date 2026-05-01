@@ -3,10 +3,7 @@ package com.psychcenter.backend.controller;
 import com.psychcenter.backend.dto.response.PsychologistResponseDto;
 import com.psychcenter.backend.service.PsychologistService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,5 +21,13 @@ public class PsychologistController {
     @GetMapping("/{id}")
     public PsychologistResponseDto getById(@PathVariable Long id) {
         return service.getById(id);
+    }
+
+    @GetMapping("/filter")
+    public List<PsychologistResponseDto> filter(
+            @RequestParam(required = false) String specialization,
+            @RequestParam(required = false) String language
+    ) {
+        return service.filter(specialization, language);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
@@ -14,4 +15,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             LocalDate date,
             LocalTime time
     );
+
+    List<Booking> findByPsychologistIdAndDate(
+            Long psychologistId,
+            LocalDate date
+    );
+
 }
