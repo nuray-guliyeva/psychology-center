@@ -14,5 +14,9 @@ public class RegisterRequest {
     private String email;
 
     @Size(min = 6)
+    @Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$",
+            message = "Password must contain letters and numbers"
+    )
     private String password;
 }

@@ -3,15 +3,17 @@ package com.psychcenter.backend.service.security;
 import com.psychcenter.backend.dto.security.LoginRequest;
 import com.psychcenter.backend.dto.security.RegisterRequest;
 import com.psychcenter.backend.dto.security.AuthResponse;
-import com.psychcenter.backend.model.entity.User;
+import com.psychcenter.backend.model.entity.user.User;
 import com.psychcenter.backend.model.enums.Role;
-import com.psychcenter.backend.repository.UserRepository;
+import com.psychcenter.backend.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -41,6 +43,7 @@ public class AuthService {
         return AuthResponse.builder()
                 .accessToken(jwtService.generateToken(user.getEmail(), user.getRole().name()))
                 .refreshToken(refresh.getToken())
+                .role(user.getRole().name())
                 .build();
     }
 
@@ -64,6 +67,7 @@ public class AuthService {
         return AuthResponse.builder()
                 .accessToken(jwtService.generateToken(user.getEmail(), user.getRole().name()))
                 .refreshToken(refresh.getToken())
+                .role(user.getRole().name())
                 .build();
     }
 }

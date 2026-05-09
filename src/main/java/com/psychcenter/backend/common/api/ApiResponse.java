@@ -20,6 +20,10 @@ public class ApiResponse<T> {
                 .build();
     }
 
+    public static <T> ApiResponse<T> success(T data) {
+        return success(data, "Success");
+    }
+
     public static ApiResponse<?> error(Object error) {
         return ApiResponse.builder()
                 .success(false)

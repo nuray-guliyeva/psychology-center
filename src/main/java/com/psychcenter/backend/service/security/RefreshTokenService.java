@@ -1,8 +1,9 @@
 package com.psychcenter.backend.service.security;
 
-import com.psychcenter.backend.model.entity.RefreshToken;
-import com.psychcenter.backend.model.entity.User;
-import com.psychcenter.backend.repository.RefreshTokenRepository;
+import com.psychcenter.backend.common.exception.base.ResourceNotFoundException;
+import com.psychcenter.backend.model.entity.security.RefreshToken;
+import com.psychcenter.backend.model.entity.user.User;
+import com.psychcenter.backend.repository.security.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,9 @@ public class RefreshTokenService {
     private final RefreshTokenRepository repository;
 
     public RefreshToken create(User user) {
+
+        repository.deleteByUser(user);
+
         RefreshToken token = RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
                 .expiryDate(LocalDateTime.now().plusDays(7))
@@ -27,7 +31,7 @@ public class RefreshTokenService {
 
     public RefreshToken validate(String token) {
         RefreshToken rt = repository.findByToken(token)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Refresh token not found"));
 
         if (rt.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Token expired");
