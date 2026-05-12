@@ -14,19 +14,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ServiceServiceImpl implements ServiceService {
 
-    private final ServiceRepository repository;
-    private final ServiceMapper mapper;
+    private final ServiceRepository serviceRepository;
+    private final ServiceMapper serviceMapper;
 
     @Override
     public ServiceResponseDto create(ServiceEntity s) {
-        return mapper.toDto(repository.save(s));
+        return serviceMapper.toDto(serviceRepository.save(s));
     }
 
     @Override
     public List<ServiceResponseDto> getAll() {
-        return repository.findAll()
+        return serviceRepository.findAll()
                 .stream()
-                .map(mapper::toDto)
+                .map(serviceMapper::toDto)
                 .toList();
     }
 }

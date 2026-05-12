@@ -6,6 +6,7 @@ import com.psychcenter.backend.dto.response.PsychologistResponseDto;
 import com.psychcenter.backend.mapper.PsychologistMapper;
 import com.psychcenter.backend.model.entity.Psychologist;
 import com.psychcenter.backend.model.entity.User;
+import com.psychcenter.backend.model.enums.Role;
 import com.psychcenter.backend.repository.PsychologistRepository;
 import com.psychcenter.backend.repository.UserRepository;
 import com.psychcenter.backend.service.PsychologistService;
@@ -26,27 +27,31 @@ import static com.psychcenter.backend.specification.PsychologistSpecification.ha
 @Transactional
 public class PsychologistServiceImpl implements PsychologistService {
 
-    private final PsychologistRepository repository;
-    private final PsychologistMapper mapper;
+    private final PsychologistRepository psychologistRepository;
+    private final PsychologistMapper psychologistMapper;
     private final UserRepository userRepository;
 
     @Override
     public PsychologistResponseDto create(PsychologistRequestDto dto) {
 
         User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found")
+                );
 
-        Psychologist p = mapper.toEntity(dto);
+        user.setRole(Role.PSYCHOLOGIST);
+
+        Psychologist p = psychologistMapper.toEntity(dto);
 
         p.setUser(user);
         user.setPsychologist(p);
 
-        return mapper.toDto(repository.save(p));
+        return psychologistMapper.toDto(psychologistRepository.save(p));
     }
 
     @Override
     public PsychologistResponseDto update(Long id, PsychologistRequestDto dto) {
-        Psychologist p = repository.findById(id)
+        Psychologist p = psychologistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Psychologist not found with id: " + id));
 
 
@@ -62,24 +67,24 @@ public class PsychologistServiceImpl implements PsychologistService {
         p.setLanguages(dto.getLanguages());
         p.setApproach(dto.getApproach());
 
-        return mapper.toDto(repository.save(p));
+        return psychologistMapper.toDto(psychologistRepository.save(p));
     }
 
     @Override
     public void delete(Long id) {
-        repository.deleteById(id);
+        psychologistRepository.deleteById(id);
     }
 
     @Override
     public Page<PsychologistResponseDto> getAll(int page, int size) {
-        return repository.findAll(PageRequest.of(page, size))
-                .map(mapper::toDto);
+        return psychologistRepository.findAll(PageRequest.of(page, size))
+                .map(psychologistMapper::toDto);
     }
 
     @Override
     public PsychologistResponseDto getById(Long id) {
-        return mapper.toDto(
-                repository.findById(id).orElseThrow()
+        return psychologistMapper.toDto(
+                psychologistRepository.findById(id).orElseThrow()
         );
     }
 
@@ -90,9 +95,9 @@ public class PsychologistServiceImpl implements PsychologistService {
                 .where(hasSpecialization(specialization))
                 .and(hasLanguage(language));
 
-        return repository.findAll(spec)
+        return psychologistRepository.findAll(spec)
                 .stream()
-                .map(mapper::toDto)
+                .map(psychologistMapper::toDto)
                 .toList();
     }
 }

@@ -8,4 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BlogRepository extends JpaRepository<BlogPost, Long> {
 
     Page<BlogPost> findAll(Pageable pageable);
+
+    boolean existsByTitle(String title);
+
 }

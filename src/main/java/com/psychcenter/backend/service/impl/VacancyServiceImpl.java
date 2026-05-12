@@ -14,8 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VacancyServiceImpl implements VacancyService {
 
-    private final VacancyRepository repository;
-    private final VacancyMapper mapper;
+    private final VacancyRepository vacancyRepository;
+    private final VacancyMapper vacancyMapper;
 
     @Override
     public VacancyResponseDto create(String position,
@@ -31,14 +31,14 @@ public class VacancyServiceImpl implements VacancyService {
                 .description(description)
                 .build();
 
-        return mapper.toDto(repository.save(v));
+        return vacancyMapper.toDto(vacancyRepository.save(v));
     }
 
     @Override
     public List<VacancyResponseDto> getAll() {
-        return repository.findAll()
+        return vacancyRepository.findAll()
                 .stream()
-                .map(mapper::toDto)
+                .map(vacancyMapper::toDto)
                 .toList();
     }
 }

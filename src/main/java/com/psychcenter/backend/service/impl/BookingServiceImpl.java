@@ -32,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final PsychologistRepository psychologistRepository;
-    private final BookingMapper mapper;
+    private final BookingMapper bookingMapper;
 
     @Override
     public BookingResponseDto create(BookingRequestDto dto) {
@@ -112,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
                         .bookings(
                                 entry.getValue()
                                         .stream()
-                                        .map(mapper::toDto)
+                                        .map(bookingMapper::toDto)
                                         .toList()
                         )
                         .totalCount(entry.getValue().size())

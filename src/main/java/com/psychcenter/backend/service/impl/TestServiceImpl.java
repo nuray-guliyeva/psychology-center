@@ -13,20 +13,20 @@ public class TestServiceImpl implements TestService {
     @Override
     public TestResult calculate(String testName, int score) {
 
-        TestLevel level;
+        TestLevel testLevel;
 
         if (score < 10) {
-            level = TestLevel.LOW;
+            testLevel = TestLevel.LOW;
         } else if (score < 20) {
-            level = TestLevel.MEDIUM;
+            testLevel = TestLevel.MEDIUM;
         } else {
-            level = TestLevel.HIGH;
+            testLevel = TestLevel.HIGH;
         }
 
         return TestResult.builder()
                 .testName(testName)
                 .score(score)
-                .level(level)
+                .level(testLevel)
                 .build();
     }
 

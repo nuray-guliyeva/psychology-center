@@ -16,25 +16,30 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class BlogServiceImpl implements BlogService {
 
-    private final BlogRepository repository;
-    private final BlogMapper mapper;
+    private final BlogRepository blogRepository;
+    private final BlogMapper blogMapper;
 
     @Override
     public BlogResponseDto create(BlogPost post) {
+
+        if (blogRepository.existsByTitle(post.getTitle())) {
+            throw new RuntimeException("Blog with this title already exists");
+        }
+
         post.setCreatedAt(LocalDateTime.now());
-        return mapper.toDto(repository.save(post));
+        return blogMapper.toDto(blogRepository.save(post));
     }
 
     @Override
     public Page<BlogResponseDto> getAll(int page, int size) {
-        return repository.findAll(PageRequest.of(page, size))
-                .map(mapper::toDto);
+        return blogRepository.findAll(PageRequest.of(page, size))
+                .map(blogMapper::toDto);
     }
 
     @Override
     public BlogResponseDto getById(Long id) {
-        return mapper.toDto(
-                repository.findById(id)
+        return blogMapper.toDto(
+                blogRepository.findById(id)
                         .orElseThrow(() -> new com.psychcenter.backend.common.exception.base.ResourceNotFoundException("Blog not found"))
         );
     }

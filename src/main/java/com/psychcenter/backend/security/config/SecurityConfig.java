@@ -47,9 +47,9 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
-                                "/api/v1/psychologists/all",
-                                "/api/v1/psychologists/filter/**",
-                                "/api/v1/psychologists/{id}"
+                                "/api/v1/psychologists",
+                                "/api/v1/psychologists/filter",
+                                "/api/v1/psychologists/*"
                         ).permitAll()
 
                         .requestMatchers("/api/v1/admin/**")
