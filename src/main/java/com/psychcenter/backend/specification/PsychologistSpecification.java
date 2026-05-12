@@ -1,6 +1,6 @@
 package com.psychcenter.backend.specification;
 
-import com.psychcenter.backend.model.entity.psychologist.Psychologist;
+import com.psychcenter.backend.model.entity.Psychologist;
 import org.springframework.data.jpa.domain.Specification;
 
 public class PsychologistSpecification {

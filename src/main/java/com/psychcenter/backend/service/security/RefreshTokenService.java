@@ -1,9 +1,9 @@
 package com.psychcenter.backend.service.security;
 
 import com.psychcenter.backend.common.exception.base.ResourceNotFoundException;
-import com.psychcenter.backend.model.entity.security.RefreshToken;
-import com.psychcenter.backend.model.entity.user.User;
-import com.psychcenter.backend.repository.security.RefreshTokenRepository;
+import com.psychcenter.backend.model.entity.RefreshToken;
+import com.psychcenter.backend.model.entity.User;
+import com.psychcenter.backend.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

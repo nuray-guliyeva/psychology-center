@@ -1,7 +1,7 @@
 package com.psychcenter.backend.service.security.impl;
 
-import com.psychcenter.backend.model.entity.user.User;
-import com.psychcenter.backend.repository.user.UserRepository;
+import com.psychcenter.backend.model.entity.User;
+import com.psychcenter.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
