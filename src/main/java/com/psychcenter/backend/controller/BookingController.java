@@ -45,7 +45,8 @@ public class BookingController {
 
     @PostMapping
     public ApiResponse<BookingResponseDto> create(
-            @RequestBody @Valid BookingRequestDto dto
+            @Valid
+            @RequestBody BookingRequestDto dto
     ) {
         return ApiResponse.success(
                 bookingService.create(dto),

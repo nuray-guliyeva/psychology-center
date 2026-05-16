@@ -1,12 +1,12 @@
 package com.psychcenter.backend.service;
 
+import com.psychcenter.backend.dto.request.BlogCreateRequestDto;
 import com.psychcenter.backend.dto.response.BlogResponseDto;
-import com.psychcenter.backend.model.entity.BlogPost;
 import org.springframework.data.domain.Page;
 
 public interface BlogService {
 
-    BlogResponseDto create(BlogPost post);
+    BlogResponseDto create(BlogCreateRequestDto dto);
 
     Page<BlogResponseDto> getAll(int page, int size);
 

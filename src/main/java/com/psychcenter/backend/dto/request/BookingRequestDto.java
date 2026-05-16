@@ -10,13 +10,13 @@ import java.time.LocalTime;
 @Data
 public class BookingRequestDto {
 
-    @NotNull
+    @NotNull(message = "Psychologist id is required")
     private Long psychologistId;
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull(message = "Date is required")
+    @FutureOrPresent(message = "Date cannot be in the past")
     private LocalDate date;
 
-    @NotNull
+    @NotNull(message = "Time is required")
     private LocalTime time;
 }

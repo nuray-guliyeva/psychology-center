@@ -1,5 +1,6 @@
 package com.psychcenter.backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,5 +23,6 @@ public class Test {
     private String description;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Question> questions;
 }

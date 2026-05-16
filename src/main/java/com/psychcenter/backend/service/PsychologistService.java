@@ -20,4 +20,5 @@ public interface PsychologistService {
 
     List<PsychologistResponseDto> filter(String specialization, String language);
 
+    List<PsychologistResponseDto> recommend(String level);
 }

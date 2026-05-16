@@ -8,33 +8,37 @@ import java.util.List;
 @Data
 public class PsychologistRequestDto {
 
-    @NotBlank
+    @NotBlank(message = "First name is required")
+    @Size(min = 2, max = 50)
     private String firstName;
 
-    @NotBlank
+
+    @NotBlank(message = "Last name is required")
+    @Size(min = 2, max = 50)
     private String lastName;
 
-    @NotBlank
+    @NotBlank(message = "Specialization is required")
     private String specialization;
 
     @NotNull
-    @Min(0)
+    @Min(value = 0, message = "Experience cannot be negative")
     private Integer experienceYears;
 
-    @Email
-    @NotBlank
+    @Email(message = "Invalid email")
+    @NotBlank(message = "Email is required")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Phone is required")
     private String phone;
 
-    @Size(max = 2000)
+    @Size(max = 1000)
     private String bio;
 
     private String education;
 
     private List<String> certificates;
 
+    @NotEmpty(message = "At least one language required")
     private List<String> languages;
 
     private String approach;

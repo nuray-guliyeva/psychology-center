@@ -1,6 +1,7 @@
 package com.psychcenter.backend.service.impl;
 
 import com.psychcenter.backend.common.exception.base.ResourceNotFoundException;
+import com.psychcenter.backend.common.exception.payment.PaymentAlreadyExistsException;
 import com.psychcenter.backend.dto.response.PaymentResponseDto;
 import com.psychcenter.backend.mapper.PaymentMapper;
 import com.psychcenter.backend.model.entity.Booking;
@@ -26,10 +27,14 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponseDto pay(Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Booking not found")
+                );
 
         if (paymentRepository.existsByBookingId(bookingId)) {
-            throw new RuntimeException("Booking already paid");
+            throw new PaymentAlreadyExistsException(
+                    "Booking already paid"
+            );
         }
 
         Payment p = Payment.builder()

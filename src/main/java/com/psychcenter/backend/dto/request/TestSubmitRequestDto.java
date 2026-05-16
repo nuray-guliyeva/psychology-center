@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TestSubmitRequest {
+public class TestSubmitRequestDto {
 
     @NotBlank(message = "Test name is required")
     private String testName;

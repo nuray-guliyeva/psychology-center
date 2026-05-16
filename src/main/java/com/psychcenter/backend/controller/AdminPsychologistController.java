@@ -14,12 +14,13 @@ public class AdminPsychologistController {
     private final PsychologistService service;
 
     @PostMapping
-    public Object create(@RequestBody @Valid PsychologistRequestDto dto) {
+    public Object create(@Valid @RequestBody PsychologistRequestDto dto) {
         return service.create(dto);
     }
 
     @PutMapping("/{id}")
-    public Object update(@PathVariable Long id,
+    public Object update(@Valid
+                         @PathVariable Long id,
                          @RequestBody PsychologistRequestDto dto) {
         return service.update(id, dto);
     }

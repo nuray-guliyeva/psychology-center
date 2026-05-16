@@ -23,4 +23,6 @@ public class Vacancy {
 
     @Column(length = 2000)
     private String description;
+
+    private String fileName;
 }

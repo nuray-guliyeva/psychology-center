@@ -24,8 +24,10 @@ public class UserTestResult {
     private LocalDateTime createdAt;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "test_id")
     private Test test;
 }

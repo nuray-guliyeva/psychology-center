@@ -21,12 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -35,6 +37,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
 
     @Override
+    @Transactional
     public BookingResponseDto create(BookingRequestDto dto) {
 
         String email = SecurityUtils.getCurrentUserEmail();
@@ -87,37 +90,37 @@ public class BookingServiceImpl implements BookingService {
                 LocalTime.of(16, 0)
         );
 
-        var booked = bookingRepository
+        List<LocalTime> bookedSlots = bookingRepository
                 .findByPsychologistIdAndDate(psychologistId, date)
                 .stream()
                 .map(Booking::getTime)
                 .toList();
 
         return allSlots.stream()
-                .filter(slot -> !booked.contains(slot))
+                .filter(slot -> !bookedSlots.contains(slot))
                 .toList();
     }
 
     @Override
     public List<CalendarDayDto> getCalendar(Long psychologistId) {
 
-        var bookings = bookingRepository.findByPsychologistId(psychologistId);
-
-        return bookings.stream()
-                .collect(java.util.stream.Collectors.groupingBy(Booking::getDate))
+        return bookingRepository.findByPsychologistId(psychologistId)
+                .stream()
+                .collect(Collectors.groupingBy(Booking::getDate))
                 .entrySet()
                 .stream()
                 .map(entry -> CalendarDayDto.builder()
                         .date(entry.getKey())
-                        .bookings(
-                                entry.getValue()
-                                        .stream()
-                                        .map(bookingMapper::toDto)
-                                        .toList()
+                        .bookings(entry.getValue()
+                                .stream()
+                                .sorted(Comparator.comparing(Booking::getTime))
+                                .map(bookingMapper::toDto)
+                                .toList()
                         )
                         .totalCount(entry.getValue().size())
                         .build()
                 )
+                .sorted(Comparator.comparing(CalendarDayDto::getDate))
                 .toList();
     }
 

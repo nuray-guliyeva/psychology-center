@@ -5,12 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class VacancyResponseDto {
-
+public class TestResponseDto {
     private Long id;
-    private String position;
-    private String location;
-    private String type;
+    private String name;
     private String description;
-    private String fileName;
 }

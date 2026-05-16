@@ -1,47 +1,158 @@
 package com.psychcenter.backend.service.impl;
 
-import com.psychcenter.backend.dto.request.TestSubmitRequest;
+import com.psychcenter.backend.common.exception.test.AnswerNotFoundException;
+import com.psychcenter.backend.common.exception.test.QuestionNotFoundException;
+import com.psychcenter.backend.common.exception.test.TestNotFoundException;
+import com.psychcenter.backend.dto.request.AnswerCreateRequestDto;
+import com.psychcenter.backend.dto.request.QuestionCreateRequestDto;
+import com.psychcenter.backend.dto.request.SubmitTestRequestDto;
+import com.psychcenter.backend.dto.request.TestCreateRequestDto;
+import com.psychcenter.backend.dto.response.AnswerResponseDto;
+import com.psychcenter.backend.dto.response.QuestionResponseDto;
+import com.psychcenter.backend.dto.response.TestResponseDto;
 import com.psychcenter.backend.dto.response.TestResultResponseDto;
-import com.psychcenter.backend.model.entity.TestResult;
+import com.psychcenter.backend.model.entity.*;
 import com.psychcenter.backend.model.enums.TestLevel;
+import com.psychcenter.backend.repository.AnswerOptionRepository;
+import com.psychcenter.backend.repository.QuestionRepository;
+import com.psychcenter.backend.repository.TestRepository;
+import com.psychcenter.backend.repository.UserTestResultRepository;
 import com.psychcenter.backend.service.TestService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TestServiceImpl implements TestService {
 
+    private final TestRepository testRepository;
+    private final QuestionRepository questionRepository;
+    private final AnswerOptionRepository answerOptionRepository;
+    private final UserTestResultRepository userTestResultRepository;
+
     @Override
-    public TestResult calculate(String testName, int score) {
+    @Transactional
+    public TestResponseDto createTest(TestCreateRequestDto testCreateRequest) {
 
-        TestLevel testLevel;
+        Test test = Test.builder()
+                .name(testCreateRequest.getName())
+                .description(testCreateRequest.getDescription())
+                .build();
 
-        if (score < 10) {
-            testLevel = TestLevel.LOW;
-        } else if (score < 20) {
-            testLevel = TestLevel.MEDIUM;
-        } else {
-            testLevel = TestLevel.HIGH;
-        }
+        Test saved = testRepository.save(test);
 
-        return TestResult.builder()
-                .testName(testName)
-                .score(score)
-                .level(testLevel)
+        return TestResponseDto.builder()
+                .id(saved.getId())
+                .name(saved.getName())
+                .description(saved.getDescription())
                 .build();
     }
 
     @Override
-    public TestResultResponseDto submit(TestSubmitRequest request, String email) {
+    @Transactional
+    public QuestionResponseDto addQuestion(Long testId, QuestionCreateRequestDto questionCreateRequest) {
 
-        TestResult result = calculate(
-                request.getTestName(),
-                request.getScore()
-        );
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() ->
+                        new TestNotFoundException("Test not found")
+                );
+
+        Question q = Question.builder()
+                .text(questionCreateRequest.getText())
+                .test(test)
+                .build();
+
+        Question saved = questionRepository.save(q);
+
+        return QuestionResponseDto.builder()
+                .id(saved.getId())
+                .text(saved.getText())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public AnswerResponseDto addAnswer(Long questionId, AnswerCreateRequestDto answerCreateRequest) {
+
+        Question q = questionRepository.findById(questionId)
+                .orElseThrow(() ->
+                        new QuestionNotFoundException("Question not found")
+                );
+
+        AnswerOption a = AnswerOption.builder()
+                .text(answerCreateRequest.getText())
+                .score(answerCreateRequest.getScore())
+                .question(q)
+                .build();
+
+        AnswerOption saved = answerOptionRepository.save(a);
+
+        return AnswerResponseDto.builder()
+                .id(saved.getId())
+                .text(saved.getText())
+                .score(saved.getScore())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public TestResultResponseDto submitTest(SubmitTestRequestDto submitTestRequest) {
+
+        Test test = testRepository.findById(submitTestRequest.getTestId())
+                .orElseThrow(() ->
+                        new TestNotFoundException("Test not found")
+                );
+
+        int totalScore = 0;
+
+        for (Long answerId : submitTestRequest.getAnswers().values()) {
+
+            AnswerOption answer = answerOptionRepository.findById(answerId)
+                    .orElseThrow(() ->
+                            new AnswerNotFoundException("Answer not found")
+                    );
+
+            totalScore += answer.getScore();
+        }
+
+        TestLevel level;
+
+        if (totalScore < 10) level = TestLevel.LOW;
+        else if (totalScore < 20) level = TestLevel.MEDIUM;
+        else level = TestLevel.HIGH;
+
+        UserTestResult result = UserTestResult.builder()
+                .totalScore(totalScore)
+                .level(level.name())
+                .test(test)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        userTestResultRepository.save(result);
 
         return TestResultResponseDto.builder()
-                .testName(result.getTestName())
-                .score(result.getScore())
-                .level(result.getLevel())
+                .testName(test.getName())
+                .score(totalScore)
+                .level(level)
                 .build();
+    }
+
+    @Override
+    public List<TestResultResponseDto> getTestResult(Long userId) {
+
+        return userTestResultRepository.findByUserId(userId)
+                .stream()
+                .map(r -> TestResultResponseDto.builder()
+                        .testName(r.getTest().getName())
+                        .score(r.getTotalScore())
+                        .level(TestLevel.valueOf(r.getLevel()))                        .date(r.getCreatedAt())
+                        .build()
+                )
+                .toList();
     }
 }

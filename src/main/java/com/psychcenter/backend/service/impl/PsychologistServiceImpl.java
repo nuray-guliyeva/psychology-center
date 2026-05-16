@@ -24,7 +24,7 @@ import static com.psychcenter.backend.specification.PsychologistSpecification.ha
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PsychologistServiceImpl implements PsychologistService {
 
     private final PsychologistRepository psychologistRepository;
@@ -32,6 +32,7 @@ public class PsychologistServiceImpl implements PsychologistService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public PsychologistResponseDto create(PsychologistRequestDto dto) {
 
         User user = userRepository.findByEmail(dto.getEmail())
@@ -50,6 +51,7 @@ public class PsychologistServiceImpl implements PsychologistService {
     }
 
     @Override
+    @Transactional
     public PsychologistResponseDto update(Long id, PsychologistRequestDto dto) {
         Psychologist p = psychologistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Psychologist not found with id: " + id));
@@ -71,6 +73,7 @@ public class PsychologistServiceImpl implements PsychologistService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         psychologistRepository.deleteById(id);
     }
@@ -91,12 +94,36 @@ public class PsychologistServiceImpl implements PsychologistService {
     @Override
     public List<PsychologistResponseDto> filter(String specialization, String language) {
 
-        var spec = Specification
-                .where(hasSpecialization(specialization))
-                .and(hasLanguage(language));
+        Specification<Psychologist> spec = (root, query, cb) -> cb.conjunction();
+        if (specialization != null) {
+            spec = spec.and(hasSpecialization(specialization));
+        }
+
+        if (language != null) {
+            spec = spec.and(hasLanguage(language));
+        }
 
         return psychologistRepository.findAll(spec)
                 .stream()
+                .map(psychologistMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<PsychologistResponseDto> recommend(String level) {
+
+        List<Psychologist> list = psychologistRepository.findAll();
+
+        return list.stream()
+                .filter(p -> switch (level) {
+                    case "HIGH" -> p.getSpecialization() != null &&
+                            p.getSpecialization().contains("Clinical");
+
+                    case "MEDIUM" -> p.getSpecialization() != null &&
+                            p.getSpecialization().contains("Therapy");
+
+                    default -> true;
+                })
                 .map(psychologistMapper::toDto)
                 .toList();
     }

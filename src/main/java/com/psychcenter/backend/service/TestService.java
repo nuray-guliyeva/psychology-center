@@ -1,13 +1,22 @@
 package com.psychcenter.backend.service;
 
-import com.psychcenter.backend.dto.request.TestSubmitRequest;
-import com.psychcenter.backend.dto.response.TestResultResponseDto;
-import com.psychcenter.backend.model.entity.TestResult;
+import com.psychcenter.backend.dto.request.AnswerCreateRequestDto;
+import com.psychcenter.backend.dto.request.QuestionCreateRequestDto;
+import com.psychcenter.backend.dto.request.SubmitTestRequestDto;
+import com.psychcenter.backend.dto.request.TestCreateRequestDto;
+import com.psychcenter.backend.dto.response.*;
+
+import java.util.List;
 
 public interface TestService {
 
-    TestResult calculate(String testName, int score);
+    TestResponseDto createTest(TestCreateRequestDto testCreateRequest);
 
-    TestResultResponseDto submit(TestSubmitRequest request, String email);
+    QuestionResponseDto addQuestion(Long testId, QuestionCreateRequestDto questionCreateRequest);
 
+    AnswerResponseDto addAnswer(Long questionId, AnswerCreateRequestDto answerCreateRequest);
+
+    TestResultResponseDto submitTest(SubmitTestRequestDto submitTestRequest);
+
+    List<TestResultResponseDto> getTestResult(Long userId);
 }

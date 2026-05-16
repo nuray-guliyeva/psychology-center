@@ -1,5 +1,6 @@
 package com.psychcenter.backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,5 +22,6 @@ public class AnswerOption {
 
     @ManyToOne
     @JoinColumn(name = "question_id")
+    @JsonIgnore
     private Question question;
 }

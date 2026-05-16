@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Map;
 
 @Data
-public class SubmitTestRequest {
+public class SubmitTestRequestDto {
 
     private Long testId;
 

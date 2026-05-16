@@ -7,17 +7,20 @@ import com.psychcenter.backend.repository.VacancyRepository;
 import com.psychcenter.backend.service.VacancyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class VacancyServiceImpl implements VacancyService {
 
     private final VacancyRepository vacancyRepository;
     private final VacancyMapper vacancyMapper;
 
     @Override
+    @Transactional
     public VacancyResponseDto create(String position,
                                      String location,
                                      String type,
@@ -29,6 +32,7 @@ public class VacancyServiceImpl implements VacancyService {
                 .location(location)
                 .type(type)
                 .description(description)
+                .fileName(fileName)
                 .build();
 
         return vacancyMapper.toDto(vacancyRepository.save(v));
