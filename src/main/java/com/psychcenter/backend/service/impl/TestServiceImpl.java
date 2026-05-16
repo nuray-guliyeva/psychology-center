@@ -1,5 +1,6 @@
 package com.psychcenter.backend.service.impl;
 
+import com.psychcenter.backend.common.exception.base.ResourceNotFoundException;
 import com.psychcenter.backend.common.exception.test.AnswerNotFoundException;
 import com.psychcenter.backend.common.exception.test.QuestionNotFoundException;
 import com.psychcenter.backend.common.exception.test.TestNotFoundException;
@@ -13,10 +14,8 @@ import com.psychcenter.backend.dto.response.TestResponseDto;
 import com.psychcenter.backend.dto.response.TestResultResponseDto;
 import com.psychcenter.backend.model.entity.*;
 import com.psychcenter.backend.model.enums.TestLevel;
-import com.psychcenter.backend.repository.AnswerOptionRepository;
-import com.psychcenter.backend.repository.QuestionRepository;
-import com.psychcenter.backend.repository.TestRepository;
-import com.psychcenter.backend.repository.UserTestResultRepository;
+import com.psychcenter.backend.repository.*;
+import com.psychcenter.backend.security.util.SecurityUtils;
 import com.psychcenter.backend.service.TestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +33,7 @@ public class TestServiceImpl implements TestService {
     private final QuestionRepository questionRepository;
     private final AnswerOptionRepository answerOptionRepository;
     private final UserTestResultRepository userTestResultRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -103,6 +103,13 @@ public class TestServiceImpl implements TestService {
     @Transactional
     public TestResultResponseDto submitTest(SubmitTestRequestDto submitTestRequest) {
 
+        String email = SecurityUtils.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found")
+                );
+
         Test test = testRepository.findById(submitTestRequest.getTestId())
                 .orElseThrow(() ->
                         new TestNotFoundException("Test not found")
@@ -122,14 +129,19 @@ public class TestServiceImpl implements TestService {
 
         TestLevel level;
 
-        if (totalScore < 10) level = TestLevel.LOW;
-        else if (totalScore < 20) level = TestLevel.MEDIUM;
-        else level = TestLevel.HIGH;
+        if (totalScore < 10) {
+            level = TestLevel.LOW;
+        } else if (totalScore < 20) {
+            level = TestLevel.MEDIUM;
+        } else {
+            level = TestLevel.HIGH;
+        }
 
         UserTestResult result = UserTestResult.builder()
+                .user(user)
+                .test(test)
                 .totalScore(totalScore)
                 .level(level.name())
-                .test(test)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -139,20 +151,30 @@ public class TestServiceImpl implements TestService {
                 .testName(test.getName())
                 .score(totalScore)
                 .level(level)
+                .date(result.getCreatedAt())
                 .build();
     }
 
     @Override
-    public List<TestResultResponseDto> getTestResult(Long userId) {
+    public List<TestResultResponseDto> getCurrentUserResults() {
 
-        return userTestResultRepository.findByUserId(userId)
+        String email = SecurityUtils.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found")
+                );
+
+        return userTestResultRepository.findByUserId(user.getId())
                 .stream()
                 .map(r -> TestResultResponseDto.builder()
                         .testName(r.getTest().getName())
                         .score(r.getTotalScore())
-                        .level(TestLevel.valueOf(r.getLevel()))                        .date(r.getCreatedAt())
+                        .level(TestLevel.valueOf(r.getLevel()))
+                        .date(r.getCreatedAt())
                         .build()
                 )
                 .toList();
     }
+
 }

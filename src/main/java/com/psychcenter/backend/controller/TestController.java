@@ -52,8 +52,8 @@ public class TestController {
         return service.submitTest(submitTestRequestDto);
     }
 
-    @GetMapping("/history/{userId}")
-    public List<TestResultResponseDto> history(@PathVariable Long userId) {
-        return service.getTestResult(userId);
+    @GetMapping("/history")
+    public List<TestResultResponseDto> history() {
+        return service.getCurrentUserResults();
     }
 }

@@ -1,6 +1,7 @@
 package com.psychcenter.backend.service.impl;
 
 import com.psychcenter.backend.common.exception.base.ResourceNotFoundException;
+import com.psychcenter.backend.common.exception.booking.BookingConflictException;
 import com.psychcenter.backend.dto.request.BookingRequestDto;
 import com.psychcenter.backend.dto.response.BookingResponseDto;
 import com.psychcenter.backend.dto.response.CalendarDayDto;
@@ -17,6 +18,7 @@ import com.psychcenter.backend.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,20 +44,15 @@ public class BookingServiceImpl implements BookingService {
 
         String email = SecurityUtils.getCurrentUserEmail();
 
-        User user = userRepository.findByEmail(email)                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found")
+                );
 
         Psychologist psychologist = psychologistRepository.findById(dto.getPsychologistId())
-                .orElseThrow(() -> new ResourceNotFoundException("Psychologist not found"));
-
-        if (bookingRepository.existsByPsychologistAndDateAndTime(
-                psychologist,
-                dto.getDate(),
-                dto.getTime()
-        )) {
-            throw new com.psychcenter.backend.common.exception.booking.BookingConflictException(
-                    "This time slot is already booked"
-            );
-        }
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Psychologist not found")
+                );
 
         Booking booking = Booking.builder()
                 .user(user)
@@ -66,16 +63,20 @@ public class BookingServiceImpl implements BookingService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        bookingRepository.save(booking);
+        try {
 
-        return BookingResponseDto.builder()
-                .id(booking.getId())
-                .psychologistName(psychologist.getFirstName())
-                .date(booking.getDate())
-                .time(booking.getTime())
-                .status(booking.getStatus())
-                .build();
+            Booking savedBooking = bookingRepository.saveAndFlush(booking);
+
+            return bookingMapper.toDto(savedBooking);
+
+        } catch (DataIntegrityViolationException ex) {
+
+            throw new BookingConflictException(
+                    "This time slot is already booked"
+            );
+        }
     }
+
 
     @Override
     public List<LocalTime> getAvailableSlots(Long psychologistId, LocalDate date) {
