@@ -1,6 +1,5 @@
 package com.psychcenter.backend.model.entity;
 
-import com.psychcenter.backend.common.entity.BaseEntity;
 import com.psychcenter.backend.model.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +26,11 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Booking extends BaseEntity {
+public class Booking {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -42,6 +45,8 @@ public class Booking extends BaseEntity {
 
     @Column(nullable = false)
     private LocalTime time;
+
+    private Double amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

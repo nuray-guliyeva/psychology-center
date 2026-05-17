@@ -11,6 +11,7 @@ import com.psychcenter.backend.repository.BookingRepository;
 import com.psychcenter.backend.repository.PaymentRepository;
 import com.psychcenter.backend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,18 +32,24 @@ public class PaymentServiceImpl implements PaymentService {
                         new ResourceNotFoundException("Booking not found")
                 );
 
-        if (paymentRepository.existsByBookingId(bookingId)) {
+        Payment payment = Payment.builder()
+                .booking(booking)
+                .amount(booking.getAmount())
+                .status(PaymentStatus.SUCCESS)
+                .build();
+
+        try {
+
+            Payment saved = paymentRepository.save(payment);
+
+            return paymentMapper.toDto(saved);
+
+        } catch (DataIntegrityViolationException e) {
+
             throw new PaymentAlreadyExistsException(
                     "Booking already paid"
             );
         }
-
-        Payment p = Payment.builder()
-                .booking(booking)
-                .amount(50.0)
-                .status(PaymentStatus.SUCCESS)
-                .build();
-
-        return paymentMapper.toDto(paymentRepository.save(p));
     }
+
 }

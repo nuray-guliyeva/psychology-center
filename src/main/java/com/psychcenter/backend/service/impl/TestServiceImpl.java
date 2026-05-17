@@ -138,10 +138,10 @@ public class TestServiceImpl implements TestService {
         }
 
         UserTestResult result = UserTestResult.builder()
-                .user(user)
-                .test(test)
                 .totalScore(totalScore)
-                .level(level.name())
+                .level(level)
+                .test(test)
+                .user(user)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -170,7 +170,7 @@ public class TestServiceImpl implements TestService {
                 .map(r -> TestResultResponseDto.builder()
                         .testName(r.getTest().getName())
                         .score(r.getTotalScore())
-                        .level(TestLevel.valueOf(r.getLevel()))
+                        .level(r.getLevel())
                         .date(r.getCreatedAt())
                         .build()
                 )

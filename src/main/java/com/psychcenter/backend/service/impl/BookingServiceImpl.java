@@ -59,6 +59,7 @@ public class BookingServiceImpl implements BookingService {
                 .psychologist(psychologist)
                 .date(dto.getDate())
                 .time(dto.getTime())
+                .amount(50.0)
                 .status(BookingStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -67,7 +68,13 @@ public class BookingServiceImpl implements BookingService {
 
             Booking savedBooking = bookingRepository.saveAndFlush(booking);
 
-            return bookingMapper.toDto(savedBooking);
+            return BookingResponseDto.builder()
+                    .id(savedBooking.getId())
+                    .psychologistName(psychologist.getFirstName())
+                    .date(savedBooking.getDate())
+                    .time(savedBooking.getTime())
+                    .status(savedBooking.getStatus())
+                    .build();
 
         } catch (DataIntegrityViolationException ex) {
 

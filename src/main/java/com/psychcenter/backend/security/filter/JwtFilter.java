@@ -2,6 +2,7 @@ package com.psychcenter.backend.security.filter;
 
 import com.psychcenter.backend.service.security.JwtService;
 import com.psychcenter.backend.service.security.impl.UserDetailsServiceImpl;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,11 +42,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                var userDetails = userDetailsService.loadUserByUsername(username);
+                var userDetails =
+                        userDetailsService.loadUserByUsername(username);
 
                 if (jwtService.isTokenValid(token, userDetails.getUsername())) {
 
-                    var authToken = new UsernamePasswordAuthenticationToken(
+                    var authToken =
+                            new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
                             userDetails.getAuthorities()
@@ -55,15 +58,15 @@ public class JwtFilter extends OncePerRequestFilter {
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
 
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    SecurityContextHolder
+                            .getContext()
+                            .setAuthentication(authToken);
                 }
             }
 
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("Invalid JWT token");
-            return;
+        } catch (JwtException ignored) {
+
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);

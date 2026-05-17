@@ -5,6 +5,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Table(
+        name = "payments",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "booking_id")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor

@@ -1,11 +1,13 @@
 package com.psychcenter.backend.model.entity;
 
+import com.psychcenter.backend.model.enums.TestLevel;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "user_test_results")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,17 +19,21 @@ public class UserTestResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int totalScore;
+    @Column(nullable = false)
+    private Integer totalScore;
 
-    private String level;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TestLevel level;
 
-    private LocalDateTime createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "test_id", nullable = false)
+    private Test test;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "test_id")
-    private Test test;
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 }

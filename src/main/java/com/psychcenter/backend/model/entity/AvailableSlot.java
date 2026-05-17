@@ -1,6 +1,5 @@
 package com.psychcenter.backend.model.entity;
 
-import com.psychcenter.backend.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,7 +24,11 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AvailableSlot extends BaseEntity {
+public class AvailableSlot {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "psychologist_id", nullable = false)

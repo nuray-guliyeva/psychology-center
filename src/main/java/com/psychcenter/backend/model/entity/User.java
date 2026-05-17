@@ -1,6 +1,5 @@
 package com.psychcenter.backend.model.entity;
 
-import com.psychcenter.backend.common.entity.BaseEntity;
 import com.psychcenter.backend.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User extends BaseEntity {
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String name;
