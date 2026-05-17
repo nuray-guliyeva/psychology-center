@@ -117,12 +117,26 @@ public class TestServiceImpl implements TestService {
 
         int totalScore = 0;
 
-        for (Long answerId : submitTestRequest.getAnswers().values()) {
+        for (var entry : submitTestRequest.getAnswers().entrySet()) {
+
+            Long questionId = entry.getKey();
+            Long answerId = entry.getValue();
+
+            Question question = questionRepository.findById(questionId)
+                    .orElseThrow(() ->
+                            new QuestionNotFoundException("Question not found")
+                    );
 
             AnswerOption answer = answerOptionRepository.findById(answerId)
                     .orElseThrow(() ->
                             new AnswerNotFoundException("Answer not found")
                     );
+
+            if (!answer.getQuestion().getId().equals(question.getId())) {
+                throw new IllegalArgumentException(
+                        "Answer does not belong to question"
+                );
+            }
 
             totalScore += answer.getScore();
         }

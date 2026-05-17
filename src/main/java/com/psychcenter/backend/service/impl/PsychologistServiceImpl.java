@@ -75,7 +75,15 @@ public class PsychologistServiceImpl implements PsychologistService {
     @Override
     @Transactional
     public void delete(Long id) {
-        psychologistRepository.deleteById(id);
+
+        Psychologist psychologist = psychologistRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Psychologist not found with id: " + id
+                        )
+                );
+
+        psychologistRepository.delete(psychologist);
     }
 
     @Override
@@ -86,9 +94,15 @@ public class PsychologistServiceImpl implements PsychologistService {
 
     @Override
     public PsychologistResponseDto getById(Long id) {
-        return psychologistMapper.toDto(
-                psychologistRepository.findById(id).orElseThrow()
-        );
+
+        Psychologist psychologist = psychologistRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Psychologist not found with id: " + id
+                        )
+                );
+
+        return psychologistMapper.toDto(psychologist);
     }
 
     @Override

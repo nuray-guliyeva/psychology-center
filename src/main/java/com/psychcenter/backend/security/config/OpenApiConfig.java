@@ -18,7 +18,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Psych Center API")
-                        .version("1.0")
+                        .version("1.0.0")
                         .description("Psychology Center Backend API")
                 )
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))

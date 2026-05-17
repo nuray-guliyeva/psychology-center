@@ -1,5 +1,6 @@
 package com.psychcenter.backend.service.security;
 
+import com.psychcenter.backend.common.exception.auth.RefreshTokenExpiredException;
 import com.psychcenter.backend.common.exception.base.ResourceNotFoundException;
 import com.psychcenter.backend.model.entity.RefreshToken;
 import com.psychcenter.backend.model.entity.User;
@@ -34,8 +35,7 @@ public class RefreshTokenService {
                 .orElseThrow(() -> new ResourceNotFoundException("Refresh token not found"));
 
         if (rt.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
-        }
+            throw new RefreshTokenExpiredException("Refresh token expired");        }
 
         return rt;
     }

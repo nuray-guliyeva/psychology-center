@@ -5,6 +5,7 @@ import com.psychcenter.backend.security.handler.JwtAccessDeniedHandler;
 import com.psychcenter.backend.security.handler.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,22 +39,26 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers(
                                 "/api/v1/auth/**",
-                                "/api/v1/blog/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        .requestMatchers(
-                                "/api/v1/psychologists",
-                                "/api/v1/psychologists/filter",
-                                "/api/v1/psychologists/*"
-                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/blog/**")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/psychologists/**")
+                        .permitAll()
 
                         .requestMatchers("/api/v1/admin/**")
                         .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/blog/**")
+                        .hasAnyRole("ADMIN", "PSYCHOLOGIST")
 
                         .requestMatchers("/api/v1/psychologists/**")
                         .hasAnyRole("ADMIN", "PSYCHOLOGIST")

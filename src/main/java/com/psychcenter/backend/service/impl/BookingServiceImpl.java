@@ -49,10 +49,34 @@ public class BookingServiceImpl implements BookingService {
                         new ResourceNotFoundException("User not found")
                 );
 
+        if (dto.getDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "Booking date cannot be in the past"
+            );
+        }
+
+        List<LocalTime> allowedSlots = List.of(
+                LocalTime.of(9, 0),
+                LocalTime.of(10, 0),
+                LocalTime.of(11, 0),
+                LocalTime.of(12, 0),
+                LocalTime.of(14, 0),
+                LocalTime.of(15, 0),
+                LocalTime.of(16, 0)
+        );
+
+        if (!allowedSlots.contains(dto.getTime())) {
+            throw new IllegalArgumentException(
+                    "Invalid booking time"
+            );
+        }
+
         Psychologist psychologist = psychologistRepository.findById(dto.getPsychologistId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Psychologist not found")
                 );
+
+        validateBookingDate(dto.getDate(), dto.getTime());
 
         Booking booking = Booking.builder()
                 .user(user)
@@ -130,6 +154,21 @@ public class BookingServiceImpl implements BookingService {
                 )
                 .sorted(Comparator.comparing(CalendarDayDto::getDate))
                 .toList();
+    }
+
+
+    private void validateBookingDate(LocalDate date, LocalTime time) {
+
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        if (date.isBefore(today)) {
+            throw new IllegalArgumentException("Booking date cannot be in the past");
+        }
+
+        if (date.isEqual(today) && time.isBefore(now)) {
+            throw new IllegalArgumentException("Booking time cannot be in the past");
+        }
     }
 
 }

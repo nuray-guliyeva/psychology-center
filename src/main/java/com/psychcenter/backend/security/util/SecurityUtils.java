@@ -1,6 +1,8 @@
 package com.psychcenter.backend.security.util;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -15,8 +17,9 @@ public class SecurityUtils {
                 || !authentication.isAuthenticated()
                 || authentication instanceof AnonymousAuthenticationToken) {
 
-            throw new RuntimeException("User is not authenticated");
-        }
+            throw new AuthenticationCredentialsNotFoundException(
+                    "User is not authenticated"
+            );        }
 
         return authentication.getName();
     }
