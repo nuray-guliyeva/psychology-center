@@ -9,15 +9,9 @@ public class BaseException extends RuntimeException {
     private final ErrorCode errorCode;
     private final HttpStatus status;
 
-    public BaseException(ErrorCode errorCode, String message) {
-        super(message);
-        this.errorCode = errorCode;
-        this.status = HttpStatus.BAD_REQUEST;
-    }
-
     public BaseException(ErrorCode errorCode, String message, HttpStatus status) {
         super(message);
         this.errorCode = errorCode;
-        this.status = status;
+        this.status = HttpStatus.BAD_REQUEST;
     }
 }
